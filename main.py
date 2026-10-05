@@ -1,8 +1,12 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="Student Management API")
+frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,11 +38,6 @@ class Student(BaseModel):
     course: str
 
 
-@app.get("/")
-def root():
-    return {"message": "Student Management API is running"}
-
-
 @app.get("/api/students")
 def get_students():
     return students
@@ -68,3 +67,6 @@ def get_student(student_id: int):
             return student
 
     return {"message": "Student not found"}
+
+
+app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
